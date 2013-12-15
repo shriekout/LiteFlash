@@ -1,0 +1,17 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/switch_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/OFF"
+        android:textColor="#006633"
+        android:textStyle="bold"
+        android:textSize="42sp"
+        android:background="#000000"/>
+
+</RelativeLayout>

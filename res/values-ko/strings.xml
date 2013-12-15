@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">작은등</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_about">이 프로그램은</string>
+
+    <string name="OFF">OFF</string>
+    
+    <string name="app_descrip">
+        <![CDATA[
+		<h4>이 프로그램은 카메라 플래시를 제어합니다.<br/><br/><font color="red">주의: 플래시를 장시간 사용하면 과열될 우려가 있습니다.</font><br/><br/><a href="http://github.com/shriekout">http://github.com/shriekout</a></h4>
+		]]>
+	</string>
+    <string name="about_ok">확인</string>
+
+</resources>
