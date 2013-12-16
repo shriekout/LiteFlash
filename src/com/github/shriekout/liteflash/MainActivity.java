@@ -3,17 +3,18 @@ package com.github.shriekout.liteflash;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -22,14 +23,26 @@ public class MainActivity extends Activity {
 	Camera camera = null;
 	Parameters parameters;
 	
-	Button switch_button;
+	ImageButton switch_button;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		int screenWidth;
 		
-		switch_button = (Button) findViewById(R.id.switch_button);
+		DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		screenWidth = metrics.widthPixels;
+		
+		switch_button = (ImageButton) findViewById(R.id.switch_button);
+		
+		ViewGroup.LayoutParams params = switch_button.getLayoutParams();
+		params.width = screenWidth / 2;
+		params.height = params.width;
+		
+		switch_button.setLayoutParams(params);
 
 		switch_button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -60,9 +73,7 @@ public class MainActivity extends Activity {
 		parameters = camera.getParameters();
 		parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
 		camera.setParameters(parameters);
-	    
-		switch_button.setText("ON");
-		switch_button.setTextColor(Color.parseColor("#00FF00"));
+		switch_button.setImageResource(R.drawable.on_power);
 		mode = 1;
 	}
 	
@@ -71,9 +82,7 @@ public class MainActivity extends Activity {
 		camera.setParameters(parameters);
 		camera.release();
 		camera = null;
-		
-		switch_button.setText("OFF");
-		switch_button.setTextColor(Color.parseColor("#006633"));
+		switch_button.setImageResource(R.drawable.off_power);
 		mode = 0;
 	}
 	
