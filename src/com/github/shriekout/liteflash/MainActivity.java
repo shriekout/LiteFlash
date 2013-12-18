@@ -5,6 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -14,16 +18,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SensorEventListener {
 	int mode = 1;	// mode1:OFF	mode2:ON
 	
 	Camera camera = null;
 	Parameters parameters;
 	
 	ImageButton switch_button;
+	ImageView imageViewCompass;
+	TextView tvHeading;
+	
+	private float currentDegree = 0f;
+	
+	private SensorManager mSensorManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,23 +46,40 @@ public class MainActivity extends Activity {
 
 		int screenWidth;
 		
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		screenWidth = metrics.widthPixels;
 		
 		switch_button = (ImageButton) findViewById(R.id.switch_button);
+		imageViewCompass = (ImageView) findViewById(R.id.imageViewCompass);
+		tvHeading = (TextView) findViewById(R.id.tvHeading);
+
+		ViewGroup.LayoutParams switch_params = switch_button.getLayoutParams();
+		switch_params.width = screenWidth / 2;
+		switch_params.height = switch_params.width;
 		
-		ViewGroup.LayoutParams params = switch_button.getLayoutParams();
-		params.width = screenWidth / 2;
-		params.height = params.width;
-		
-		switch_button.setLayoutParams(params);
+		switch_button.setLayoutParams(switch_params);
 
 		switch_button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				onoff();
 			}
 		});
+		
+		ViewGroup.LayoutParams compass_params = imageViewCompass.getLayoutParams();
+		compass_params.width = screenWidth / 3;
+		compass_params.height = compass_params.width;
+		
+		imageViewCompass.setLayoutParams(compass_params);
+		
+		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+		ViewGroup.LayoutParams tvHeading_params = tvHeading.getLayoutParams();
+		tvHeading_params.width = compass_params.width;
+		tvHeading_params.height = tvHeading_params.width;
+		tvHeading.setLayoutParams(compass_params);
 		
 		flashOn();
 	}
@@ -100,6 +131,30 @@ public class MainActivity extends Activity {
 		
 		return true;
 	}
+	
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		int degree = (int) Math.round(event.values[0]);
+		
+		tvHeading.setText(Integer.toString(degree));
+		
+		RotateAnimation ra = new RotateAnimation(
+				currentDegree,
+				-degree,
+				Animation.RELATIVE_TO_SELF, 0.5f,
+				Animation.RELATIVE_TO_SELF, 0.5f);
+		
+		ra.setDuration(210);
+		
+		ra.setFillAfter(true);
+		
+		imageViewCompass.startAnimation(ra);
+		currentDegree = -degree;
+	}
+	
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	}
 
 	protected void showAbout() {
 		TextView tv = new TextView(this);
@@ -120,13 +175,23 @@ public class MainActivity extends Activity {
 		builder.create();
 		builder.show();
 	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
+				SensorManager.SENSOR_DELAY_GAME);
+	}
 	
 	@Override
-	public void onPause(){
+	protected void onPause(){
 		super.onPause();
 		
 		if (camera != null) {
 			flashOff();
 		}
+		
+		mSensorManager.unregisterListener(this);
 	}
 }
