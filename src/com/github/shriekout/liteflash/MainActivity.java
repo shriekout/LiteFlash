@@ -3,6 +3,8 @@ package com.github.shriekout.liteflash;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Sensor;
@@ -157,13 +159,22 @@ public class MainActivity extends Activity implements SensorEventListener {
 	}
 
 	protected void showAbout() {
+		String version = "";
+		String name_ver;
+		
 		TextView tv = new TextView(this);
 		tv.setText(Html.fromHtml(getString(R.string.app_descrip)));
 		tv.setMovementMethod(LinkMovementMethod.getInstance());
 		
+		try {
+			PackageInfo i = getPackageManager().getPackageInfo(getPackageName(), 0);
+			version = i.versionName;
+		} catch(NameNotFoundException e) {}
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setIcon(R.drawable.ic_launcher);
-		builder.setTitle(R.string.app_name);
+		name_ver = getString(R.string.app_name) + " " + version;
+		builder.setTitle(name_ver);
 		builder.setView(tv);
 		tv.setPadding(20, 20, 20, 20);
 		
